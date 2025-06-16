@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Login TUITTER</title>
+  <title>TUITTER - Login</title>
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: linear-gradient(135deg, #1DA1F2, #0d8ddb);
+      margin: 0;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      margin: 0;
       color: #fff;
     }
-    .login-container {
+    .login-container, .homepage-container {
       background-color: rgba(0, 0, 0, 0.6);
       padding: 30px 40px;
       border-radius: 12px;
@@ -23,7 +23,7 @@
       box-shadow: 0 8px 16px rgba(0,0,0,0.3);
       text-align: center;
     }
-    .login-container h1 {
+    .login-container h1, .homepage-container h1 {
       font-size: 36px;
       margin-bottom: 10px;
       font-weight: 700;
@@ -35,8 +35,8 @@
       font-weight: 400;
       color: #cce4fc;
     }
-    .login-container input[type="text"],
-    .login-container input[type="password"] {
+    input[type="text"],
+    input[type="password"] {
       width: 100%;
       padding: 12px 15px;
       margin-bottom: 20px;
@@ -44,7 +44,7 @@
       border-radius: 8px;
       font-size: 16px;
     }
-    .login-container input[type="submit"] {
+    input[type="submit"], button.logout-btn {
       background-color: #1DA1F2;
       border: none;
       color: white;
@@ -56,7 +56,7 @@
       font-weight: 600;
       transition: background-color 0.3s ease;
     }
-    .login-container input[type="submit"]:hover {
+    input[type="submit"]:hover, button.logout-btn:hover {
       background-color: #0d8ddb;
     }
     .footer {
@@ -64,20 +64,43 @@
       font-size: 14px;
       color: #a0c9f7;
     }
+    .error-msg {
+      color: #ff6b6b;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
   </style>
 </head>
 <body>
-  <div class="login-container">
+
+  <div class="login-container" id="loginContainer">
     <h1>TUITTER</h1>
     <h2>Masuk ke akun kamu</h2>
-    <form>
-      <input type="text" placeholder="Username atau Email" required />
-      <input type="password" placeholder="Kata Sandi" required />
+    <form id="loginForm">
+      <div class="error-msg" id="errorMsg" style="display:none;"></div>
+      <input type="text" id="username" placeholder="Username atau Email" required />
+      <input type="password" id="password" placeholder="Kata Sandi" required />
       <input type="submit" value="Masuk" />
     </form>
     <div class="footer">
       Belum punya akun? <a href="#" style="color:#81c0ff; text-decoration:none;">Daftar di sini</a>
     </div>
   </div>
-</body>
-</html>
+
+  <div class="homepage-container" id="homepageContainer" style="display:none;">
+    <h1>Selamat datang di TUITTER!</h1>
+    <p>Kamu sudah berhasil login.</p>
+    <button class="logout-btn" id="logoutBtn">Keluar</button>
+  </div>
+
+  <script>
+    const validUsername = "user";
+    const validPassword = "tuitter123";
+
+    const loginContainer = document.getElementById("loginContainer");
+    const homepageContainer = document.getElementById("homepageContainer");
+    const loginForm = document.getElementById("loginForm");
+    const errorMsg = document.getElementById("errorMsg");
+    const logoutBtn = document.getElementById("logoutBtn");
+
+    loginForm.addEvent
