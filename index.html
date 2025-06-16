@@ -103,4 +103,31 @@
     const errorMsg = document.getElementById("errorMsg");
     const logoutBtn = document.getElementById("logoutBtn");
 
-    loginForm.addEvent
+    loginForm.addEventListener("submit", function(e) {
+      e.preventDefault();
+
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value;
+
+      if (username === validUsername && password === validPassword) {
+        // Login sukses
+        errorMsg.style.display = "none";
+        loginContainer.style.display = "none";
+        homepageContainer.style.display = "block";
+      } else {
+        // Login gagal
+        errorMsg.style.display = "block";
+        errorMsg.textContent = "Username atau password salah!";
+      }
+    });
+
+    logoutBtn.addEventListener("click", function() {
+      homepageContainer.style.display = "none";
+      loginContainer.style.display = "block";
+      loginForm.reset();
+      errorMsg.style.display = "none";
+    });
+  </script>
+
+</body>
+</html>
