@@ -7,7 +7,7 @@
   <style>
     body {
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #1DA1F2, #0d8ddb);
+      background: linear-gradient(135deg, #30cfd0, #330867); /* tosca-ish gradient */
       margin: 0;
       height: 100vh;
       display: flex;
@@ -19,9 +19,13 @@
       background-color: rgba(0, 0, 0, 0.6);
       padding: 30px 40px;
       border-radius: 12px;
-      width: 320px;
+      width: 360px;
       box-shadow: 0 8px 16px rgba(0,0,0,0.3);
       text-align: center;
+      display: flex;
+      flex-direction: column;
+      height: 500px;
+      position: relative;
     }
     .login-container h1, .homepage-container h1 {
       font-size: 36px;
@@ -33,7 +37,7 @@
       font-size: 18px;
       margin-bottom: 25px;
       font-weight: 400;
-      color: #cce4fc;
+      color: #a0eee1;
     }
     input[type="text"],
     input[type="password"] {
@@ -45,7 +49,7 @@
       font-size: 16px;
     }
     input[type="submit"], button.logout-btn {
-      background-color: #1DA1F2;
+      background-color: #30cfd0;
       border: none;
       color: white;
       padding: 12px;
@@ -57,17 +61,53 @@
       transition: background-color 0.3s ease;
     }
     input[type="submit"]:hover, button.logout-btn:hover {
-      background-color: #0d8ddb;
+      background-color: #2bb2b3;
     }
     .footer {
       margin-top: 20px;
       font-size: 14px;
-      color: #a0c9f7;
+      color: #a0eee1;
     }
     .error-msg {
       color: #ff6b6b;
       margin-bottom: 15px;
       font-weight: 600;
+    }
+    /* Homepage specific */
+    .homepage-header {
+      flex-shrink: 0;
+      margin-bottom: 15px;
+    }
+    .content-area {
+      flex-grow: 1;
+      background-color: rgba(255, 255, 255, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      font-size: 18px;
+      color: #e0f7f5;
+      overflow-y: auto;
+    }
+    .menu-bar {
+      flex-shrink: 0;
+      margin-top: 20px;
+      display: flex;
+      justify-content: space-around;
+      background-color: rgba(0, 0, 0, 0.4);
+      border-radius: 12px;
+      padding: 10px 0;
+    }
+    .menu-bar button {
+      background: none;
+      border: none;
+      color: #a0eee1;
+      font-size: 16px;
+      cursor: pointer;
+      flex-grow: 1;
+      transition: color 0.3s ease;
+    }
+    .menu-bar button.active, .menu-bar button:hover {
+      color: #30cfd0;
+      font-weight: 700;
     }
   </style>
 </head>
@@ -83,14 +123,26 @@
       <input type="submit" value="Masuk" />
     </form>
     <div class="footer">
-      Belum punya akun? <a href="#" style="color:#81c0ff; text-decoration:none;">Daftar di sini</a>
+      Belum punya akun? <a href="#" style="color:#81e6d9; text-decoration:none;">Daftar di sini</a>
     </div>
   </div>
 
   <div class="homepage-container" id="homepageContainer" style="display:none;">
-    <h1>Selamat datang di TUITTER!</h1>
-    <p>Kamu sudah berhasil login.</p>
-    <button class="logout-btn" id="logoutBtn">Keluar</button>
+    <div class="homepage-header">
+      <h1>Selamat datang di TUITTER!</h1>
+      <button class="logout-btn" id="logoutBtn" style="width: auto; margin-top: 10px;">Keluar</button>
+    </div>
+
+    <div class="content-area" id="contentArea">
+      For You content muncul di sini...
+    </div>
+
+    <nav class="menu-bar" aria-label="Menu navigasi utama">
+      <button id="menuForYou" class="active">For You</button>
+      <button id="menuSearch">Search</button>
+      <button id="menuDM">DM</button>
+      <button id="menuProfile">Profile</button>
+    </nav>
   </div>
 
   <script>
@@ -102,6 +154,13 @@
     const loginForm = document.getElementById("loginForm");
     const errorMsg = document.getElementById("errorMsg");
     const logoutBtn = document.getElementById("logoutBtn");
+    const contentArea = document.getElementById("contentArea");
+
+    const menuForYou = document.getElementById("menuForYou");
+    const menuSearch = document.getElementById("menuSearch");
+    const menuDM = document.getElementById("menuDM");
+    const menuProfile = document.getElementById("menuProfile");
+    const menuButtons = [menuForYou, menuSearch, menuDM, menuProfile];
 
     loginForm.addEventListener("submit", function(e) {
       e.preventDefault();
@@ -110,12 +169,12 @@
       const password = document.getElementById("password").value;
 
       if (username === validUsername && password === validPassword) {
-        // Login sukses
         errorMsg.style.display = "none";
         loginContainer.style.display = "none";
-        homepageContainer.style.display = "block";
+        homepageContainer.style.display = "flex";
+        setActiveMenu(menuForYou);
+        contentArea.textContent = "For You content muncul di sini...";
       } else {
-        // Login gagal
         errorMsg.style.display = "block";
         errorMsg.textContent = "Username atau password salah!";
       }
@@ -126,6 +185,34 @@
       loginContainer.style.display = "block";
       loginForm.reset();
       errorMsg.style.display = "none";
+    });
+
+    // Fungsi set menu active & ganti konten
+    function setActiveMenu(activeBtn) {
+      menuButtons.forEach(btn => {
+        btn.classList.remove("active");
+      });
+      activeBtn.classList.add("active");
+
+      switch(activeBtn.id) {
+        case "menuForYou":
+          contentArea.textContent = "For You content muncul di sini...";
+          break;
+        case "menuSearch":
+          contentArea.textContent = "Cari sesuatu di TUITTER...";
+          break;
+        case "menuDM":
+          contentArea.textContent = "Kotak pesan langsung (DM) kamu.";
+          break;
+        case "menuProfile":
+          contentArea.textContent = "Profil dan pengaturan akun kamu.";
+          break;
+      }
+    }
+
+    // Event klik menu
+    menuButtons.forEach(btn => {
+      btn.addEventListener("click", () => setActiveMenu(btn));
     });
   </script>
 
