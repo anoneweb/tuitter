@@ -159,7 +159,7 @@
     .search-item {
       padding: 10px;
       border-bottom: 1px solid rgba(255,255,255,0.2);
-      cursor: default;
+      cursor: pointer; /* clickable now */
     }
     .search-item:last-child {
       border-bottom: none;
@@ -239,25 +239,66 @@
   </div>
 
   <script>
-    // Data artis & postingan untuk contoh
-    const artistsPosts = [
-      {name: "Taylor Swift", content: "Sedang menulis lagu baru yang keren! 🎶"},
-      {name: "BTS", content: "Thank you for all the love from ARMY worldwide! 💜"},
-      {name: "Ariana Grande", content: "Loving life and new music coming soon! ✨"},
-      {name: "Ed Sheeran", content: "Just dropped a new single, check it out! 🎤"},
-      {name: "Billie Eilish", content: "Exploring new sounds, stay tuned! 🎧"},
+    // Data artis & postingan untuk contoh, plus detail followers/following tiap artis
+    const artistsData = [
+      {
+        name: "Taylor Swift",
+        username: "@taylorswift",
+        followers: 1000000,
+        following: 150,
+        posts: [
+          "Sedang menulis lagu baru yang keren! 🎶",
+          "Thanks untuk semua fans yang selalu support!",
+          "Konser akan segera hadir di kotamu.",
+        ],
+      },
+      {
+        name: "BTS",
+        username: "@bts_official",
+        followers: 1500000,
+        following: 100,
+        posts: [
+          "Thank you for all the love from ARMY worldwide! 💜",
+          "Kita akan rilis album baru bulan depan.",
+          "Sesi latihan sudah selesai, siap tampil!",
+        ],
+      },
+      {
+        name: "Ariana Grande",
+        username: "@arianagrande",
+        followers: 800000,
+        following: 200,
+        posts: [
+          "Loving life and new music coming soon! ✨",
+          "Video musik terbaru sudah tayang!",
+          "Thank you for the love and support!",
+        ],
+      },
+      {
+        name: "Ed Sheeran",
+        username: "@edsheeran",
+        followers: 900000,
+        following: 170,
+        posts: [
+          "Just dropped a new single, check it out! 🎤",
+          "On the road for my world tour.",
+          "Writing songs inspired by fans.",
+        ],
+      },
+      {
+        name: "Billie Eilish",
+        username: "@billieeilish",
+        followers: 750000,
+        following: 130,
+        posts: [
+          "Exploring new sounds, stay tuned! 🎧",
+          "Studio time is the best time.",
+          "Thanks for listening to my music.",
+        ],
+      },
     ];
 
-    // Data artis untuk search (nama + username)
-    const artistAccounts = [
-      {name: "Taylor Swift", username: "@taylorswift"},
-      {name: "BTS", username: "@bts_official"},
-      {name: "Ariana Grande", username: "@arianagrande"},
-      {name: "Ed Sheeran", username: "@edsheeran"},
-      {name: "Billie Eilish", username: "@billieeilish"},
-    ];
-
-    // Data profile user (contoh)
+    // Data profil user (contoh)
     const userProfile = {
       name: "User TUITTER",
       username: "@usertuit",
@@ -286,6 +327,9 @@
     const menuProfile = document.getElementById("menuProfile");
     const menuButtons = [menuForYou, menuSearch, menuDM, menuProfile];
 
+    // Variable untuk simpan profil yang sedang dibuka (user atau artis)
+    let currentProfile = "user"; // default profile user
+
     loginForm.addEventListener("submit", function(e) {
       e.preventDefault();
 
@@ -297,7 +341,7 @@
         loginContainer.style.display = "none";
         homepageContainer.style.display = "flex";
         setActiveMenu(menuForYou);
-        renderForYou();
+        currentProfile = "user";
       } else {
         errorMsg.style.display = "block";
         errorMsg.textContent = "Username atau password salah!";
@@ -310,6 +354,9 @@
       loginForm.reset();
       errorMsg.style.display = "none";
       contentArea.innerHTML = "";
+      currentProfile = "user";
+      clearActive();
+      menuForYou.classList.add("active");
     });
 
     function clearActive() {
@@ -337,18 +384,21 @@
     }
 
     menuButtons.forEach(btn => {
-      btn.addEventListener("click", () => setActiveMenu(btn));
+      btn.addEventListener("click", () => {
+        currentProfile = "user"; // reset ke user profile kalau pindah menu
+        setActiveMenu(btn);
+      });
     });
 
-    // Render halaman For You (5 postingan)
+    // Render halaman For You (5 postingan artis)
     function renderForYou() {
       contentArea.innerHTML = "";
-      artistsPosts.forEach(post => {
+      artistsData.forEach(artist => {
         const postEl = document.createElement("div");
         postEl.className = "post";
         postEl.innerHTML = `
-          <div class="artist-name">${post.name}</div>
-          <div class="post-content">${post.content}</div>
+          <div class="artist-name">${artist.name}</div>
+          <div class="post-content">${artist.posts[0]}</div>
         `;
         contentArea.appendChild(postEl);
       });
@@ -367,7 +417,7 @@
       function showResults(filter) {
         searchResults.innerHTML = "";
         if(filter.trim() === "") return;
-        const filtered = artistAccounts.filter(acc =>
+        const filtered = artistsData.filter(acc =>
           acc.name.toLowerCase().includes(filter.toLowerCase()) ||
           acc.username.toLowerCase().includes(filter.toLowerCase())
         );
@@ -379,6 +429,11 @@
           const item = document.createElement("div");
           item.className = "search-item";
           item.textContent = `${acc.name} (${acc.username})`;
+          // Ketika klik akun, buka profil artis tersebut
+          item.addEventListener("click", () => {
+            currentProfile = acc.username; // simpan username profil yang sedang dibuka
+            setActiveMenu(menuProfile);
+          });
           searchResults.appendChild(item);
         });
       }
@@ -395,17 +450,30 @@
 
     // Render halaman Profile
     function renderProfile() {
+      let profileData;
+
+      if(currentProfile === "user") {
+        profileData = userProfile;
+      } else {
+        profileData = artistsData.find(artist => artist.username === currentProfile);
+        if(!profileData) {
+          // fallback ke user profile kalau username tidak ditemukan
+          profileData = userProfile;
+          currentProfile = "user";
+        }
+      }
+
       contentArea.innerHTML = `
         <div class="profile-header">
-          <div class="profile-name">${userProfile.name}</div>
-          <div class="profile-username">${userProfile.username}</div>
+          <div class="profile-name">${profileData.name}</div>
+          <div class="profile-username">${profileData.username}</div>
           <div class="profile-follow">
-            <div><strong>${userProfile.followers}</strong> Followers</div>
-            <div><strong>${userProfile.following}</strong> Following</div>
+            <div><strong>${profileData.followers}</strong> Followers</div>
+            <div><strong>${profileData.following}</strong> Following</div>
           </div>
         </div>
         <div class="profile-posts" aria-label="Postingan pengguna">
-          ${userProfile.posts.map(p => `<div class="post"><div class="post-content">${p}</div></div>`).join("")}
+          ${profileData.posts.map(p => `<div class="post"><div class="post-content">${p}</div></div>`).join("")}
         </div>
       `;
     }
